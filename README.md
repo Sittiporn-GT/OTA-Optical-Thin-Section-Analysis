@@ -4,7 +4,6 @@
 
 [![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://www.python.org/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-1.13+-ee4c2c.svg)](https://pytorch.org/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 OTA is a dual-modal semantic segmentation framework that automatically delineates and
 classifies mineral grains in petrographic thin sections by jointly exploiting
