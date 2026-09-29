@@ -155,11 +155,10 @@ python train.py -d=0
 ### Evaluation
 
 ```bash
-python eval.py -d=0 -e=ota -p/results/ota/
+python eval.py -d=0 -e=ota -p=results/ota/
 ```
 
-The script reports per-class IoU, mIoU, per-class pixel accuracy, and mPA over the 14 mineral
-classes.
+The script reports per-class IoU, mIoU, per-class pixel accuracy, and mPA over the 14 mineral classes.
 
 ## Training configuration
 
