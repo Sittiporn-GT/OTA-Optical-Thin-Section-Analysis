@@ -6,7 +6,7 @@
 [![PyTorch](https://img.shields.io/badge/PyTorch-1.13+-ee4c2c.svg)](https://pytorch.org/)
 
 OTA is a dual-modal semantic segmentation framework that automatically delineates and
-classifies mineral grains in petrographic thin sections by jointly exploiting
+classifies mineral grains in thin-section images by jointly exploiting
 **plane-polarized light (PPL)** and **cross-polarized light (XPL)** micrographs.
 
 Built on top of the CMX (Cross-Modal Fusion for RGB-X Semantic Segmentation) framework,
@@ -54,6 +54,7 @@ loss to handle the extreme class imbalance typical of modal mineralogy.
 
 **Mineral classes:** quartz, K-feldspar, plagioclase, biotite, hornblende, clinopyroxene,
 orthopyroxene, olivine, muscovite, leucite, opaque minerals, tourmaline, topaz, spinel.
+
 
 ### Expected directory layout
 
@@ -107,7 +108,11 @@ pip install -r requirements.txt
 
 | Checkpoint | Backbone | mIoU | Link |
 |---|---|---|---|
-| `CMX.pth` | MiT-B2 | 82.50 | [_add release link_](https://doi.org/10.5281/zenodo.23027010) |
+| `CMX.pth` | MiT-B2 | 73.98 | [_Checkpoint_](https://doi.org/10.5281/zenodo.23027010) |
+| `CMX+Upernet.pth` | MiT-B2 | 74.48 | [_Ckeckpoint_](https://doi.org/10.5281/zenodo.23027435) |
+| `CMX+Upernet+IA-WCE.pth` | MiT-B2 | 76.21 | [_Ckeckpoint_](https://doi.org/10.5281/zenodo.23027569) |
+| `CMX+Upernet+IA-WCE+DeformCA.pth` | MiT-B2 | 80.13 | [_Ckeckpoint_](https://doi.org/10.5281/zenodo.23027621) |
+| `OTA.pth` | MiT-B2 | 82.50 | [_Ckeckpoint_](https://doi.org/10.5281/zenodo.23027695) |
 
 ---
 
@@ -117,7 +122,7 @@ pip install -r requirements.txt
 
 ```bash
 python train.py \
-    --config configs/ota_config.py \
+    --config configs/config.py \
     --data-root data/OTA \
     --gpus 1
 ```
@@ -126,8 +131,8 @@ python train.py \
 
 ```bash
 python eval.py \
-    --config configs/ota_config.py \
-    --checkpoint checkpoints/ota_mit_b2.pth \
+    --config configs/config.py \
+    --checkpoint checkpoints/OTA.pth \
     --split test
 ```
 
@@ -135,7 +140,7 @@ python eval.py \
 
 ```bash
 python predict.py \
-    --checkpoint checkpoints/ota_mit_b2.pth \
+    --checkpoint checkpoints/OTA.pth \
     --ppl samples/sample_ppl.png \
     --xpl samples/sample_xpl.png \
     --out results/sample_pred.png
