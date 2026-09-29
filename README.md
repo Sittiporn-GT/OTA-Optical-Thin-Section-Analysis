@@ -107,9 +107,7 @@ pip install -r requirements.txt
 
 | Checkpoint | Backbone | mIoU | Link |
 |---|---|---|---|
-| `ota_mit_b2.pth` | MiT-B2 | 82.50 | _add release link_ |
-
-Place downloaded weights in `checkpoints/`.
+| `CMX.pth` | MiT-B2 | 82.50 | [_add release link_](https://doi.org/10.5281/zenodo.23027010) |
 
 ---
 
