@@ -252,10 +252,6 @@ If you use this code or dataset, please cite:
 
 ## Acknowledgements
 
-This work builds on [CMX](https://github.com/huaaaliu/RGBX_Semantic_Segmentation),
-[UPerNet](https://github.com/CSAILVision/unifiedparsing), and
-We thank the contributors of these projects.
-
 This research was supported by the **Development and Promotion of Science and Technology
 Talented Project (DPST)**, the **Institute for the Promotion of Teaching Science and
 Technology (IPST)**, and the **90th Anniversary of Chulalongkorn University Scholarship**
