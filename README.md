@@ -44,7 +44,7 @@ loss to handle the extreme class imbalance.
   accessory grains.
 - **IA-WCE loss** — reweights rare mineral classes such as topaz, spinel and tourmaline.
 - **State of the art** — **82.50 % mIoU** and **91.48 % mPA**, outperforming the CMX baseline,
-  U-Net, DeepLabV3+, and the AMS-ppl / AMS-xpl single-modal models.
+  U-Net, DeepLabV3+, and the AMS-p/xpl models.
 
 ---
 
@@ -170,7 +170,7 @@ python train.py -d=0
 python eval.py -d=0 -e=ota -p/results/ota/
 ```
 
-The script reports per-class IoU, mIoU, per-class pixel accuracy and mPA over the 14 mineral
+The script reports per-class IoU, mIoU, per-class pixel accuracy, and mPA over the 14 mineral
 classes.
 
 ## Training configuration
