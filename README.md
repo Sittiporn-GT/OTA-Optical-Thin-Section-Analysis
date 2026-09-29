@@ -5,7 +5,9 @@
 [![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://www.python.org/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-1.13+-ee4c2c.svg)](https://pytorch.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![mIoU](https://img.shields.io/badge/mIoU-82.50%25-success.svg)](#results)
 [![Weights](https://img.shields.io/badge/Weights-Zenodo-1682D4.svg)](https://doi.org/10.5281/zenodo.23027695)
+[![Dataset](https://img.shields.io/badge/Dataset-Zenodo-1682D4.svg)](https://doi.org/10.5281/zenodo.23046535)
 
 OTA is a dual-modal semantic segmentation framework that automatically delineates and
 classifies mineral grains in thin-section images by jointly exploiting
@@ -18,22 +20,6 @@ loss to handle the extreme class imbalance.
 
 ---
 
-## Table of contents
-
-- [Highlights](#highlights)
-- [Results](#results)
-- [Ablation study and pretrained weights](#ablation-study-and-pretrained-weights)
-- [Dataset](#dataset)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Training configuration](#training-configuration)
-- [Architecture](#architecture)
-- [Repository structure](#repository-structure)
-- [Citation](#citation)
-- [License](#license)
-
----
-
 ## Highlights
 
 - **Dual-modal input** — PPL and XPL image pairs are fused rather than processed separately.
@@ -42,7 +28,7 @@ loss to handle the extreme class imbalance.
 - **SWA** — shifted window attention for efficient long-range context at high resolution.
 - **UPerNet decoder** — multi-scale feature aggregation for both large phenocrysts and fine
   accessory grains.
-- **IA-WCE loss** — reweights rare mineral classes such as topaz, spinel and tourmaline.
+- **IA-WCE loss** — reweights rare mineral classes such as topaz, spinel, and tourmaline.
 - **State of the art** — **82.50 % mIoU** and **91.48 % mPA**, outperforming the CMX baseline,
   U-Net, DeepLabV3+, and the AMS-p/xpl models.
 
@@ -52,10 +38,10 @@ loss to handle the extreme class imbalance.
 
 | Model | Modality | mIoU (%) | mPA (%) |
 |---|---|---|---|
-| U-Net | PPL only | 61.35 | 69.36 |
-| DeepLabV3+ | PPL only | 59.74 | 68.44 |
-| AMS | PPL only | 76.82 | 84.23 |
-| AMS | PPL + XPL | 79.65 | 87.83 |
+| U-Net | XPL only | 61.35 | 69.36 |
+| DeepLabV3+ | XPL only | 59.74 | 68.44 |
+| AMS-xpl | XPL only | 76.82 | 84.23 |
+| AMS-p/xpl | PPL + XPL | 79.65 | 87.83 |
 | CMX (baseline) | PPL + XPL | 73.98 | 82.76 |
 | **OTA (ours)** | **PPL + XPL** | **82.50** | **91.48** |
 
@@ -85,24 +71,26 @@ Place the downloaded `.pth` files in `checkpoints/` before running evaluation.
 
 | Property | Value |
 |---|---|
-| Thin-Section Image pairs | 2,090 (PPL + XPL) |
+| Thin-section image pairs | 2,090 (PPL + XPL) |
 | Source | Three granitic belts, Thailand |
 | Rock types | 15 plutonic rock types |
-| Mineral classes | 14 |
+| Mineral classes | 14 (+ background) |
 
 ### Class index
 
 | ID | Mineral | ID | Mineral |
 |---|---|---|---|
-| 1 | quartz | 8 | orthopyroxene |
-| 2 | K-feldspar | 9 | olivine |
-| 3 | plagioclase | 10 | muscovite |
-| 4 | biotite | 11 | leucite |
-| 5 | hornblende | 12 | opaque minerals |
-| 6 | clinopyroxene | 13 | tourmaline |
-| 7 | topaz | 14 | spinel |
+| 0 | background | 8 | orthopyroxene |
+| 1 | quartz | 9 | olivine |
+| 2 | K-feldspar | 10 | muscovite |
+| 3 | plagioclase | 11 | leucite |
+| 4 | biotite | 12 | opaque minerals |
+| 5 | hornblende | 13 | tourmaline |
+| 6 | clinopyroxene | 14 | spinel |
+| 7 | topaz | | |
 
-Label masks are single-channel PNG with values `1–14`; `0` is background.
+Label masks are single-channel PNG with values `0–14`, where `0` is background and
+`1–14` correspond to the mineral classes above.
 
 ### Expected directory layout
 
@@ -128,7 +116,7 @@ same filename**.
 
 ### Download
 
-(Demo test) Dataset archived on Zenodo: [10.5281/zenodo.XXXXXXX](https://doi.org/10.5281/zenodo.XXXXXXX)
+(Demo test) Dataset archived on Zenodo: [10.5281/zenodo.23046535](https://doi.org/10.5281/zenodo.23046535)
 
 ---
 
@@ -188,22 +176,6 @@ classes.
 
 ---
 
-## Architecture
-
-```
-PPL ──► Encoder (SWA / Transformer)  ─┐
-                                      ├──► DeformCA fusion ──► UPerNet decoder ──► IA-WCE ──► mask
-XPL ──► Encoder (SWA / Transformer)  ─┘
-```
-
-1. **Dual encoders** extract hierarchical features from PPL and XPL independently.
-2. **DeformCA** learns sampling offsets so each modality attends to geometrically
-   corresponding regions of the other.
-3. **SWA** provides efficient global context across shifted windows.
-4. **UPerNet** aggregates the fused multi-scale features into the final segmentation map.
-
----
-
 ## Repository structure
 
 ```
@@ -251,6 +223,12 @@ If you use this code or dataset, please cite:
 ---
 
 ## Acknowledgements
+
+## Acknowledgements
+
+This work builds on [CMX](https://github.com/huaaaliu/RGBX_Semantic_Segmentation) and
+[UPerNet](https://github.com/CSAILVision/unifiedparsing)
+We thank the contributors of these projects.
 
 This research was supported by the **Development and Promotion of Science and Technology
 Talented Project (DPST)**, the **Institute for the Promotion of Teaching Science and
