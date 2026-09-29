@@ -4,6 +4,8 @@
 
 [![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://www.python.org/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-1.13+-ee4c2c.svg)](https://pytorch.org/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Weights](https://img.shields.io/badge/Weights-Zenodo-1682D4.svg)](https://doi.org/10.5281/zenodo.23027695)
 
 OTA is a dual-modal semantic segmentation framework that automatically delineates and
 classifies mineral grains in thin-section images by jointly exploiting
@@ -12,7 +14,23 @@ classifies mineral grains in thin-section images by jointly exploiting
 Built on top of the CMX (Cross-Modal Fusion for RGB-X Semantic Segmentation) framework,
 OTA introduces **Deformable Cross-Attention (DeformCA)**, **Shifted Window Attention (SWA)**,
 a **UPerNet** multi-scale decoder, and an **Imbalance-Aware Weighted Cross-Entropy (IA-WCE)**
-loss to handle the extreme class imbalance typical of modal mineralogy.
+loss to handle the extreme class imbalance.
+
+---
+
+## Table of contents
+
+- [Highlights](#highlights)
+- [Results](#results)
+- [Ablation study and pretrained weights](#ablation-study-and-pretrained-weights)
+- [Dataset](#dataset)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Training configuration](#training-configuration)
+- [Architecture](#architecture)
+- [Repository structure](#repository-structure)
+- [Citation](#citation)
+- [License](#license)
 
 ---
 
@@ -24,7 +42,7 @@ loss to handle the extreme class imbalance typical of modal mineralogy.
 - **SWA** — shifted window attention for efficient long-range context at high resolution.
 - **UPerNet decoder** — multi-scale feature aggregation for both large phenocrysts and fine
   accessory grains.
-- **IA-WCE loss** — reweights rare mineral classes (e.g. topaz, spinel, tourmaline).
+- **IA-WCE loss** — reweights rare mineral classes such as topaz, spinel and tourmaline.
 - **State of the art** — **82.50 % mIoU** and **91.48 % mPA**, outperforming the CMX baseline,
   U-Net, DeepLabV3+, and the AMS-ppl / AMS-xpl single-modal models.
 
@@ -34,12 +52,32 @@ loss to handle the extreme class imbalance typical of modal mineralogy.
 
 | Model | Modality | mIoU (%) | mPA (%) |
 |---|---|---|---|
-| U-Net | single | 61.35 | 69.36 |
-| DeepLabV3+ | single | 59.74 | 68.44 |
-| AMS-ppl | XPL | 76.82 | 84.23 |
-| AMS-xpl | PPL + XPL | 79.65 | 87.83 |
-| CMX (baseline) | PPL + XPL | 73.10 | 82.76 |
+| U-Net | PPL only | 61.35 | 69.36 |
+| DeepLabV3+ | PPL only | 59.74 | 68.44 |
+| AMS | PPL only | 76.82 | 84.23 |
+| AMS | PPL + XPL | 79.65 | 87.83 |
+| CMX (baseline) | PPL + XPL | 73.98 | 82.76 |
 | **OTA (ours)** | **PPL + XPL** | **82.50** | **91.48** |
+
+OTA improves over the CMX baseline by **+8.52 pp mIoU** and over the strongest dual-modal
+model (AMS-p/xpl) by **+2.85 pp mIoU**, while also raising mean pixel accuracy above 91 %.
+
+---
+
+## Ablation study and pretrained weights
+
+Each row adds one component on top of the previous configuration, so the table doubles as the
+ablation study reported in the paper.
+
+| Configuration | Backbone | mIoU (%) | Gain | Download |
+|---|---|---|---|---|
+| CMX (baseline) | MiT-B2 | 73.98 | — | [Checkpoint](https://doi.org/10.5281/zenodo.23027010) |
+| + UPerNet | MiT-B2 | 74.48 | +0.50 | [Checkpoint](https://doi.org/10.5281/zenodo.23027435) |
+| + IA-WCE | MiT-B2 | 76.21 | +1.73 | [Checkpoint](https://doi.org/10.5281/zenodo.23027569) |
+| + DeformCA | MiT-B2 | 80.13 | +3.92 | [Checkpoint](https://doi.org/10.5281/zenodo.23027621) |
+| **+ SWA (= OTA)** | **MiT-B2** | **82.50** | **+2.37** | [**Checkpoint**](https://doi.org/10.5281/zenodo.23027695) |
+
+Place the downloaded `.pth` files in `checkpoints/` before running evaluation.
 
 ---
 
@@ -47,28 +85,38 @@ loss to handle the extreme class imbalance typical of modal mineralogy.
 
 | Property | Value |
 |---|---|
-| Image pairs | 2,090 (PPL + XPL) |
+| Thin-Section Image pairs | 2,090 (PPL + XPL) |
 | Source | Three granitic belts, Thailand |
 | Rock types | 15 plutonic rock types |
 | Mineral classes | 14 |
 
-**Mineral classes:** quartz, K-feldspar, plagioclase, biotite, hornblende, clinopyroxene,
-orthopyroxene, olivine, muscovite, leucite, opaque minerals, tourmaline, topaz, spinel.
+### Class index
 
+| ID | Mineral | ID | Mineral |
+|---|---|---|---|
+| 1 | quartz | 8 | orthopyroxene |
+| 2 | K-feldspar | 9 | olivine |
+| 3 | plagioclase | 10 | muscovite |
+| 4 | biotite | 11 | leucite |
+| 5 | hornblende | 12 | opaque minerals |
+| 6 | clinopyroxene | 13 | tourmaline |
+| 7 | topaz | 14 | spinel |
+
+Label masks are single-channel PNG with values `1–14`; `0` is background.
 
 ### Expected directory layout
 
 ```
 data/
 └── OTA/
-    ├── PPL/          # plane-polarized light images
-    │   ├── 0001.png
+    ├── PPL/          
+    │   ├── 01_granite.png
     │   └── ...
-    ├── XPL/          # cross-polarized light images (same filenames as PPL)
-    │   ├── 0001.png
+    ├── XPL/          
+    │   ├── 01_granite.png
     │   └── ...
-    ├── Label/        # single-channel label masks, values 0..13 (255 = ignore)
-    │   ├── 0001.png
+    ├── Label/       
+    │   ├── 01_granite.png
     │   └── ...
     ├── train.txt
     ├── val.txt
@@ -77,6 +125,10 @@ data/
 
 Each `*.txt` file lists one sample stem per line. PPL, XPL, and label files **must share the
 same filename**.
+
+### Download
+
+(Demo test) Dataset archived on Zenodo: [10.5281/zenodo.XXXXXXX](https://doi.org/10.5281/zenodo.XXXXXXX)
 
 ---
 
@@ -104,49 +156,22 @@ pip install -r requirements.txt
 
 ---
 
-## Pretrained weights
-
-| Checkpoint | Backbone | mIoU | Link |
-|---|---|---|---|
-| `CMX.pth` | MiT-B2 | 73.98 | [_Checkpoint_](https://doi.org/10.5281/zenodo.23027010) |
-| `CMX+Upernet.pth` | MiT-B2 | 74.48 | [_Ckeckpoint_](https://doi.org/10.5281/zenodo.23027435) |
-| `CMX+Upernet+IA-WCE.pth` | MiT-B2 | 76.21 | [_Ckeckpoint_](https://doi.org/10.5281/zenodo.23027569) |
-| `CMX+Upernet+IA-WCE+DeformCA.pth` | MiT-B2 | 80.13 | [_Ckeckpoint_](https://doi.org/10.5281/zenodo.23027621) |
-| `OTA.pth` | MiT-B2 | 82.50 | [_Ckeckpoint_](https://doi.org/10.5281/zenodo.23027695) |
-
----
-
 ## Usage
 
 ### Training
 
 ```bash
-python train.py \
-    --config configs/config.py \
-    --data-root data/OTA \
-    --gpus 1
+python train.py -d=0
 ```
 
 ### Evaluation
 
 ```bash
-python eval.py \
-    --config configs/config.py \
-    --checkpoint checkpoints/OTA.pth \
-    --split test
+python eval.py -d=0 -e=ota -p/results/ota/
 ```
 
-### Inference on a single PPL/XPL pair
-
-```bash
-python predict.py \
-    --checkpoint checkpoints/OTA.pth \
-    --ppl samples/sample_ppl.png \
-    --xpl samples/sample_xpl.png \
-    --out results/sample_pred.png
-```
-
----
+The script reports per-class IoU, mIoU, per-class pixel accuracy and mPA over the 14 mineral
+classes.
 
 ## Training configuration
 
@@ -217,12 +242,24 @@ If you use this code or dataset, please cite:
 
 ---
 
+## Related work
+
+- [PViT — Petrographic Vision Transformer](https://github.com/Sittiporn-GT/PViT-Petrographic-Vision-Transformer)
+  — classification of 15 plutonic rock types from thin-section images, a complementary task
+  to the grain-level segmentation performed here.
+
+---
+
 ## Acknowledgements
 
 This work builds on [CMX](https://github.com/huaaaliu/RGBX_Semantic_Segmentation),
 [UPerNet](https://github.com/CSAILVision/unifiedparsing), and
-[Deformable DETR](https://github.com/fundamentalvision/Deformable-DETR).
 We thank the contributors of these projects.
+
+This research was supported by the **Development and Promotion of Science and Technology
+Talented Project (DPST)**, the **Institute for the Promotion of Teaching Science and
+Technology (IPST)**, and the **90th Anniversary of Chulalongkorn University Scholarship**
+under the Ratchadapisek Somphot Endowment Fund.
 
 ---
 
